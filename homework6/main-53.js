@@ -64,4 +64,4 @@ const first = (arr, n) => {
   return newArray
 }
 
-console.log(first(users, 12))
+console.log(first(users, 3))
