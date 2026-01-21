@@ -6,7 +6,15 @@ const todoKeys = {
   is_completed: "is_completed",
 };
 
-const todos = [];
+const getTodosFromLocalStorage = () => {
+  return JSON.parse(localStorage.getItem('todos'))
+}
+
+const setTodosToLocalStorage = todos => {
+  localStorage.setItem('todos', JSON.stringify(todos))
+}
+
+const todos = getTodosFromLocalStorage() || [];
 
 const errTodoNotFound = todoId => `Todo with id ${todoId} not found`;
 
@@ -66,11 +74,28 @@ const createTodoElement = todo => {
   return todoElement
 }
 
+const renderTodos = (todos, container) => {
+  container.innerHTML = "";
+  todos.forEach((todo) => {
+    const todoElement = createTodoElement(todo);
+    if (todo[todoKeys.is_completed]) {
+      todoElement.classList.add('completed')
+    }
+
+    container.prepend(todoElement);
+  });
+}
+
 const handleCreateTodo = (todos, text) => {
   const todo = createTodo(todos, text)
   const todoElement = createTodoElement(todo)
+  setTodosToLocalStorage(todos)
   todosList.prepend(todoElement)
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderTodos(todos, todosList)
+})
 
 formEl.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -88,10 +113,12 @@ todosList.addEventListener('click', ({target}) => {
 
   if (target.matches('.button-complete')) {
     completeTodoById(todos, todoID)
+    setTodosToLocalStorage(todos)
     todo.classList.toggle('completed')
   }
   if (target.matches('.button-delete')) {
     deleteTodoById(todos, todoID)
+    setTodosToLocalStorage(todos)
     todo.remove()
   }
 })
